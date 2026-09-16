@@ -1,28 +1,47 @@
-// Project Title
-// Your Name
-// Date
+// Mouse, Text, Scope
+// Mr. Scott
+// Sept 15, 2026
 
-
-
-
-
-function setup() {
+// Global Variables
+let x = 100;  let y = 100;
+let c = "green";
+async function preload() {
+  let img = loadImage('lightning-dog-lightning-god.gif');
+}
+async function setup() {
   createCanvas(windowWidth, windowHeight);
+
 }
 
 function draw() {
-  background(230);
-
-  // Draw the loaded image at the mouse position
-  let mouseInfo = mouseIsPressed + "" + mouseButton.left + "" + mouseButton.right + "";
+  background(220); 
+  textSize(40);    
+  image(img, mouseX, mouseY , 100,100);
+  //mouse-related system variables (managed by library)
+  
+  let mouseInfo = mouseIsPressed + " "
+                  + mouseButton.left + " "
+                  + mouseButton.center + " "
+                  + mouseButton.right;
   text(mouseInfo, mouseX, mouseY);
+  
+  drawSquare();
+}
 
-  // Draw text at the same position
-  textSize(32);
-  fill(0);
-  text("YO EL TEACH", mouseX, mouseY - 10);
-  function keyPressed(){
-    print(key);
+function drawSquare(){
+  //draw our character (a square) on screen
+  fill(c);
+  square(x,y,50);
+}
 
+function keyPressed(){
+  //this function calls automatically
+  // - for single press captures
+  print(key + " " + keyCode);
+  if (key=== "a") {
+    c = "red";
   }
+  // for interest's sake → 
+  // [ALT] - 2 to 4 digit number
+  // – →←↓↑ unicode
 }
