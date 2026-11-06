@@ -5,6 +5,8 @@
 // Global Variables
 let c = [0, 255, 0];
 let currentBack = 0;
+let x = 0
+let y = 0;
 
 async function setup() {
   createCanvas(1700, 1080);
@@ -39,6 +41,19 @@ function createsplash() {
   arc(mouseX, mouseY + 5, 180, 50, 0, PI);
   arc(mouseX, mouseY + 10, 250, 70, 0, PI);
 }
+
+function snow() {
+  fill("white");
+  noStroke();
+
+  for (let i = 0; i < 100; i++) {
+    let x = random(width);
+    let y = random(height);
+
+    circle(x, y, 5);
+  }
+}
+
 
 function burn() {
   fill("red");
@@ -75,7 +90,7 @@ function draw() {
 
   textSize(40);
   noStroke();
-
+ 
   fill(color(253, 253, 160));
   circle(100, 100, 300);
 
@@ -118,6 +133,7 @@ function draw() {
   if (mouseX <= 200 && mouseY <= 200) {
     burn();
   }
+  snow();
 }
 
 // Middle mouse button changes the background
