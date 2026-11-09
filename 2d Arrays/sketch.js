@@ -1,4 +1,7 @@
 let count = 0;
+let sorc = 0;
+let num = 0;
+let time = 0;
 let grid = [
   [0, 255, 0, 255, 0, 255],
   [255, 0, 255, 0, 255, 0],
@@ -37,38 +40,61 @@ async function setup() {
 
 }
 function highlight(y, x) {
+
   fill(0, 255, 0, 100);
 
-  rect(x * tileSize, y * tileSize, tileSize, tileSize);
 
-  if (x - 1 >= 0)
-    rect((x - 1) * tileSize, y * tileSize, tileSize, tileSize);
+  if (sorc === 0) {
+    rect(x * tileSize, y * tileSize, tileSize, tileSize);
+    if (x - 1 >= 0)
+      rect((x - 1) * tileSize, y * tileSize, tileSize, tileSize);
 
-  if (x + 1 < cols)
+    if (x + 1 < cols)
+      rect((x + 1) * tileSize, y * tileSize, tileSize, tileSize);
+
+    if (y - 1 >= 0)
+      rect(x * tileSize, (y - 1) * tileSize, tileSize, tileSize);
+
+    if (y + 1 < rows)
+      rect(x * tileSize, (y + 1) * tileSize, tileSize, tileSize);
+
+  }
+  else if (sorc === 1) {
+    rect(x * tileSize, y * tileSize, tileSize, tileSize);
     rect((x + 1) * tileSize, y * tileSize, tileSize, tileSize);
-
-  if (y - 1 >= 0)
-    rect(x * tileSize, (y - 1) * tileSize, tileSize, tileSize);
-
-  if (y + 1 < rows)
+    rect((x + 1) * tileSize, (y + 1) * tileSize, tileSize, tileSize);
     rect(x * tileSize, (y + 1) * tileSize, tileSize, tileSize);
+  }
+
+}
+function keyPressed() {
+  if (keyCode === 32) {
+
+    if (sorc === 0) {
+      sorc = 1;
+    }
+    else if (sorc === 1) {
+      sorc = 0;
+    }
+  }
 }
 function draw() {
   background(220);
   renderGrid();
   getCurrentX();
   getCurrentY();
-
+  text("Clicks: " + num, 400, 200);
 
 
   let x = getCurrentX();
   let y = getCurrentY();
 
+  text("time: " + time, 400, 100);
   highlight(y, x);
 
   // Your win condition goes here
 
- 
+
   won = true; // Reset every frame
 
   let firstColor = grid[0][0];
@@ -80,10 +106,16 @@ function draw() {
       }
     }
   }
+  if (!won) {
+    time = round(millis() / 1000);
+    time = round(millis() / 1000);
+  }
 
   if (won) {
     fill("blue");
     textSize(40);
+    time = time;
+
     text("You Win!", 100, 100);
   }
 }
@@ -94,14 +126,24 @@ function mousePressed() {
 
     if (keyIsDown(SHIFT)) {
       flip(x, y);
+
     }
     else {
       flip(x, y);
 
-      if (x - 1 >= 0) flip(x - 1, y);
-      if (y - 1 >= 0) flip(x, y - 1);
-      if (x + 1 <= 5) flip(x + 1, y);
-      if (y + 1 <= 4) flip(x, y + 1);
+      num++;
+      if (sorc === 0) {
+        if (x - 1 >= 0) flip(x - 1, y);
+        if (y - 1 >= 0) flip(x, y - 1);
+        if (x + 1 <= 5) flip(x + 1, y);
+        if (y + 1 <= 4) flip(x, y + 1);
+      }
+      else if (sorc === 1) {
+        if (x + 1 >= 0) flip(x + 1, y);
+        if (x + 1 >= 0) flip(x + 1, y + 1);
+        if (x >= 0) flip(x, y + 1);
+      }
+
     }
   }
 }
@@ -117,6 +159,7 @@ function getCurrentY() {
 }
 
 function flip(x, y) {
+
   if (grid[y][x] === 255) grid[y][x] = 0;
   else grid[y][x] = 255;
 }
