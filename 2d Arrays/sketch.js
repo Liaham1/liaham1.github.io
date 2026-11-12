@@ -2,6 +2,10 @@ let count = 0;
 let sorc = 0;
 let num = 0;
 let time = 0;
+let fade = 0;
+let animationMode = false;
+let heatmap = [];
+let animations = [];
 let grid = [
   [0, 255, 0, 255, 0, 255],
   [255, 0, 255, 0, 255, 0],
@@ -9,6 +13,7 @@ let grid = [
   [255, 255, 255, 255, 255, 255],
   [0, 0, 0, 0, 0, 0],
 ];
+let moveHistory = [];
 let won;
 let rows = grid.length;
 let cols = grid[0].length;
@@ -35,9 +40,23 @@ function randomize() {
 async function setup() {
   createCanvas(windowWidth, windowHeight);
   randomize();
+  for (let y = 0; y < rows; y++) {
+    heatmap[y] = [];
+
+    for (let x = 0; x < cols; x++) {
+      heatmap[y][x] = 0;
+    }
+  }
 
 
+}
+function getMoveHistory(amount) {
+  let move;
 
+  move = moveHistory[moveHistory.length - amount];
+
+
+  return move;
 }
 function highlight(y, x) {
 
@@ -67,6 +86,42 @@ function highlight(y, x) {
   }
 
 }
+function animation(x, y) {
+
+  if (x >= 0 && x < cols && y >= 0 && y < rows) {
+
+    let oldColor = grid[y][x];
+
+    flip(x, y);
+
+    animations.push({
+      x: x,
+      y: y,
+      color: oldColor,
+      alpha: 255
+    });
+
+  }
+  heatmap[y][x]++;
+}
+function updateAnimations() {
+
+  for (let i = animations.length - 1; i >= 0; i--) {
+
+    let a = animations[i];
+
+    fill(a.color, a.alpha);
+    rect(a.x * tileSize, a.y * tileSize, tileSize, tileSize);
+
+    a.alpha -= 8;
+
+    if (a.alpha <= 0) {
+      animations.splice(i, 1);
+    }
+
+  }
+
+}
 function keyPressed() {
   if (keyCode === 32) {
 
@@ -75,6 +130,11 @@ function keyPressed() {
     }
     else if (sorc === 1) {
       sorc = 0;
+    }
+  }
+  if (keyIsDown(CONTROL) && key === 'z') {
+    if (moveHistory.length > 0) {
+      grid = moveHistory.pop();
     }
   }
 }
@@ -91,7 +151,7 @@ function draw() {
 
   text("time: " + time, 400, 100);
   highlight(y, x);
-
+  updateAnimations();
   // Your win condition goes here
 
 
@@ -118,30 +178,53 @@ function draw() {
 
     text("You Win!", 100, 100);
   }
+  if (animationMode) {
+    fill(0, fade);
+    rect(animX * tileSize, animY * tileSize, tileSize, tileSize);
+
+    fade -= 3;
+
+    if (fade <= 0) {
+      fade = 0;
+      animationMode = false;
+    }
+  }
 }
 function mousePressed() {
-  if (mouseX < width && mouseY < height) {
+
+  if (mouseX < cols * tileSize && mouseY < rows * tileSize) {
+
     let x = getCurrentX();
     let y = getCurrentY();
 
-    if (keyIsDown(SHIFT)) {
-      flip(x, y);
+    // Save history BEFORE changing the grid
+    moveHistory.push(grid.map(row => [...row]));
 
+    if (keyIsDown(SHIFT)) {
+      animation(x, y);
     }
     else {
-      flip(x, y);
 
       num++;
+
       if (sorc === 0) {
-        if (x - 1 >= 0) flip(x - 1, y);
-        if (y - 1 >= 0) flip(x, y - 1);
-        if (x + 1 <= 5) flip(x + 1, y);
-        if (y + 1 <= 4) flip(x, y + 1);
+
+        animation(x, y);
+
+        if (x - 1 >= 0) animation(x - 1, y);
+        if (y - 1 >= 0) animation(x, y - 1);
+        if (x + 1 < cols) animation(x + 1, y);
+        if (y + 1 < rows) animation(x, y + 1);
+
       }
+
       else if (sorc === 1) {
-        if (x + 1 >= 0) flip(x + 1, y);
-        if (x + 1 >= 0) flip(x + 1, y + 1);
-        if (x >= 0) flip(x, y + 1);
+
+        animation(x, y);
+        animation(x + 1, y);
+        animation(x + 1, y + 1);
+        animation(x, y + 1);
+
       }
 
     }
@@ -165,10 +248,32 @@ function flip(x, y) {
 }
 
 function renderGrid() {
-  for (let x = 0; x < rows; x++) {
-    for (let y = 0; y < cols; y++) {
-      fill(grid[x][y]);
-      rect(y * tileSize, x * tileSize, tileSize, tileSize);
+
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+
+      fill(grid[y][x]);
+
+      let heat = heatmap[y][x];
+
+      if (heat === 0) {
+        stroke(0);
+      }
+      else if (heat < 3) {
+        stroke(0, 0, 255);
+      }
+      else if (heat < 6) {
+        stroke(255, 150, 0);
+      }
+      else {
+        stroke(255, 0, 0);
+      }
+
+      strokeWeight(3);
+
+      rect(x * tileSize, y * tileSize, tileSize, tileSize);
     }
   }
+
+  strokeWeight(1);
 }
