@@ -1,6 +1,6 @@
-// Project Title
-// Your Name
-// Date
+// Image exercises 
+// Liam
+// Nov 17 2026
 //
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
@@ -91,22 +91,39 @@ function averageImage() {
   updatePixels();
 }
 function getpixels() {
-  for (let i = 0; i < pixels.length / 2; i += 4) {
+  for (let i = 0; i < pixels.length; i += 4) {
     let r = pixels[i];
     let g = pixels[i + 1];
     let b = pixels[i + 2];
 
-    invert(i, r, g, b);
+ 
   }
 
   updatePixels();
 }
-function invert(i,r,g,b) {
-  pixels[i +pixels.length / 2];
-  pixels[i + 1+pixels.length / 2];
-  pixels[i + 2 +pixels.length / 2];
-  
-  
+function invert() {
+  loadPixels();
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width / 2; x++) {
+
+      // Find the matching pixel on the right side
+      let mirrorX = width - 1 - x;
+      let mirrorI = (y * width + mirrorX) * 4;
+
+      let i = (y * width + x) * 4;
+
+      let r = pixels[mirrorI];
+      let g = pixels[mirrorI + 1];
+      let b = pixels[mirrorI + 2];
+
+      pixels[i] = r;
+      pixels[i + 1] = g;
+      pixels[i + 2] = b;
+    }
+  }
+
+  updatePixels();
 }
 function getavgvalue(i, r, g, b) {
   let average = (r + b + g) / 3;
@@ -147,4 +164,5 @@ function draw() {
   // gethalf();
   // averageImage();
   getpixels();
+  invert();
 }
